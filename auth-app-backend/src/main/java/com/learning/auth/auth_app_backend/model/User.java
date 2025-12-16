@@ -2,11 +2,12 @@ package com.learning.auth.auth_app_backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter // Lombok generates getters for all fields
 @Setter // Lombok generates setters for all fields
@@ -15,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor // Lombok generates a no-argument constructor (required by Hibernate)
 @Entity // Tells Hibernate/JPA that this class represents a database table
 @Table(name = "users") // Maps this entity to the table 'users'; if omitted, table name defaults to class name 'User'
-public class User {
+public class User implements UserDetails {
 
     @Id // Primary key
     @GeneratedValue(strategy = GenerationType.UUID)  // Auto-generate the ID using UUID
@@ -64,4 +65,37 @@ public class User {
         updatedAt = now;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+
+        return roles
+                .stream()
+                .map(role-> new SimpleGrantedAuthority(role.getName()))
+                .toList();
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enable;
+    }
 }
