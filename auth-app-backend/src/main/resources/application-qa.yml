@@ -1,2 +1,26 @@
 server:
-  port:8003
+  port: 8002
+
+# database connections
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/auth_app_qa
+    username: root
+    password: root@123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: true
+
+# Security Configuration
+security:
+  jwt:
+    secret: mySecretKeyForJWTTokenGenerationThatIsAtLeast64CharactersLongToMeetHMACRequirements
+    access-ttl-seconds: 3600
+    refresh-ttl-seconds: 86400
+    issuer: auth-app-backend

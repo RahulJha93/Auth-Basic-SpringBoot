@@ -19,6 +19,10 @@ spring:
         format_sql: true
     show-sql: true
 
-logging:
-  level:
-    org.springframework.security: debug
+# Security Configuration
+security:
+  jwt:
+    secret: mySecretKeyForJWTTokenGenerationThatIsAtLeast64CharactersLongToMeetHMACRequirements
+    access-ttl-seconds: 3600
+    refresh-ttl-seconds: 86400
+    issuer: auth-app-backend

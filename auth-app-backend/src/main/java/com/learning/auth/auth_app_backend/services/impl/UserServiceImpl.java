@@ -4,23 +4,44 @@ import com.learning.auth.auth_app_backend.dtos.UserDto;
 import com.learning.auth.auth_app_backend.exceptions.ResourceNotFoundException;
 import com.learning.auth.auth_app_backend.helpers.UserHelper;
 import com.learning.auth.auth_app_backend.model.Provider;
+import com.learning.auth.auth_app_backend.model.Role;
 import com.learning.auth.auth_app_backend.model.User;
+import com.learning.auth.auth_app_backend.respositories.RoleRepository;
 import com.learning.auth.auth_app_backend.respositories.UserRespository;
 import com.learning.auth.auth_app_backend.services.UserService;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-
 public class UserServiceImpl implements UserService {
 
     private final UserRespository userRespository;
+    private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
+    
+    @PostConstruct
+    public void initRoles() {
+        if (!roleRepository.existsByName("USER")) {
+            Role userRole = Role.builder()
+                    .name("USER")
+                    .build();
+            roleRepository.save(userRole);
+        }
+        
+        if (!roleRepository.existsByName("ADMIN")) {
+            Role adminRole = Role.builder()
+                    .name("ADMIN")
+                    .build();
+            roleRepository.save(adminRole);
+        }
+    }
 
     @Override
     @Transactional
@@ -34,6 +55,11 @@ public class UserServiceImpl implements UserService {
 
         User user = modelMapper.map(userDto,User.class);
         user.setProvider(userDto.getProvider()!=null ? userDto.getProvider() : Provider.LOCAL);
+        
+        // Assign default USER role
+        Role userRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new IllegalStateException("USER role not found"));
+        user.setRoles(Set.of(userRole));
 
         User savedUser = userRespository.save(user);
         return modelMapper.map(savedUser,UserDto.class);

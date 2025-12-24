@@ -1,5 +1,7 @@
 package com.learning.auth.auth_app_backend.controllers;
 
+import com.learning.auth.auth_app_backend.dtos.LoginRequest;
+import com.learning.auth.auth_app_backend.dtos.TokenResponse;
 import com.learning.auth.auth_app_backend.dtos.UserDto;
 import com.learning.auth.auth_app_backend.services.AuthService;
 import lombok.AllArgsConstructor;
@@ -20,5 +22,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(userDto));
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest){
+        return ResponseEntity.ok(authService.login(loginRequest));
     }
 }

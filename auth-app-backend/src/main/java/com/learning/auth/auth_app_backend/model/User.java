@@ -43,12 +43,13 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING) // Store enum as string in DB (e.g., "LOCAL") instead of numeric index
     private Provider provider = Provider.LOCAL;
 
-    @ManyToMany(fetch = FetchType.EAGER) // Many-to-many relationship with Role; roles are fetched eagerly
+    @ManyToMany(fetch = FetchType.EAGER) // Changed from LAZY to EAGER for JWT filter access
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     ) // Specifies join table and foreign key columns
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @PrePersist // Automatically called by Hibernate before inserting a new record
